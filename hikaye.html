@@ -639,25 +639,69 @@
             }
         }
 
-        // YÜKLE — başlangıçta hikayeler.json otomatik yüklenir
+        // YÜKLE — başlangıçta IDB'den handle geri yükle, yoksa ilk kez dosya seçtir
         loadFromLocalStorage();
-        autoLoadJsonFile();
+        ilkAcilisHandle();
 
-        // Sayfa açılışında hikayeler.json'u otomatik fetch et
-        async function autoLoadJsonFile() {
+        // Sayfa açılışında IDB'deki handle'ı dene; yoksa ilk kez dosyayı seçtir/oluştur
+        async function ilkAcilisHandle() {
+            const statusEl = document.getElementById('jsonFileStatus');
             try {
-                const resp = await fetch('./hikayeler.json', { cache: 'no-store' });
-                if (!resp.ok) throw new Error('HTTP ' + resp.status);
-                const data = await resp.json();
-                if (data.hikayeler && data.storyOrder) {
-                    hikayeler = data.hikayeler;
-                    storyOrder = data.storyOrder;
-                    renderSidebar();
-                    document.getElementById('jsonFileStatus').textContent = '📖 hikayeler.json — yüklendi';
+                const handle = await idbGet();
+                if (handle) {
+                    // Önceden bağlanmış bir dosya var
+                    const perm = await handle.queryPermission({ mode: 'readwrite' });
+                    if (perm === 'granted') {
+                        await applyJsonHandle(handle);
+                    } else {
+                        jsonFileHandle = handle;
+                        showRestoreBanner(handle.name);
+                    }
+                } else {
+                    // İlk açılış: kullanıcıdan dosya konumunu seçmesini iste
+                    if (!('showSaveFilePicker' in window)) {
+                        statusEl.textContent = '⚠️ File System API desteklenmiyor (Chrome/Edge gerekli)';
+                        return;
+                    }
+                    statusEl.innerHTML = `<span style="color:#f0a040;cursor:pointer" onclick="ilkDosyaOlustur()" title="Tıkla, hikayeler.json dosyasını oluştur/seç">🔔 İlk açılış — tıkla, JSON dosyasını oluştur</span>`;
                 }
             } catch (e) {
-                // file:// protokolü veya dosya yok → IDB handle'dan dene
-                await autoRestoreHandle();
+                console.warn('İlk açılış handle hatası:', e);
+            }
+        }
+
+        // İlk açılışta kullanıcı tıklayınca dosyayı seç/oluştur
+        async function ilkDosyaOlustur() {
+            const statusEl = document.getElementById('jsonFileStatus');
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: 'hikayeler.json',
+                    types: [{ description: 'JSON Dosyası', accept: { 'application/json': ['.json'] } }]
+                });
+                jsonFileHandle = handle;
+                setHandleUI(handle);
+                await idbPut(handle);
+                // Dosya zaten içerik barındırıyorsa oku, yoksa mevcut veriyi yaz
+                try {
+                    const file = await handle.getFile();
+                    const text = await file.text();
+                    if (text.trim()) {
+                        const data = JSON.parse(text);
+                        if (data.hikayeler && data.storyOrder) {
+                            hikayeler = data.hikayeler;
+                            storyOrder = data.storyOrder;
+                            saveToLocalStorage();
+                            renderSidebar();
+                            document.getElementById('metin').innerText = 'Lütfen soldaki menüden bir hikaye seçin.';
+                            statusEl.textContent = '✅ ' + handle.name + ' — yüklendi';
+                            return;
+                        }
+                    }
+                } catch (_) { /* boş dosya veya parse hatası → üzerine yaz */ }
+                await saveToJsonFile();  // Mevcut (boş) veriyi dosyaya yaz
+            } catch (err) {
+                if (err.name !== 'AbortError')
+                    document.getElementById('jsonFileStatus').textContent = '⚠️ ' + err.message;
             }
         }
 
