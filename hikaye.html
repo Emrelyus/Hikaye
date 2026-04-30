@@ -112,15 +112,10 @@
         }
 
         #sidebar button.selected-story {
-<<<<<<< HEAD
             background: #c8e6c9;
             /* Çok açık yeşil */
             color: #000;
             /* Açık arka planda okunabilmesi için koyu metin */
-=======
-            background: #c8e6c9; /* Çok açık yeşil */
-            color: #000; /* Açık arka planda okunabilmesi için koyu metin */
->>>>>>> 90a5e6d8d9334c5b95705f365ce59d05d5b3acb9
             border-color: #a5d6a7;
             transform: translateX(5px);
             font-weight: 600;
@@ -275,17 +270,12 @@
         </div>
 
         <div class="control-group" style="display: flex; gap: 8px;">
-<<<<<<< HEAD
             <button onclick="hikayeEkle()"
                 style="margin: 0; flex: 1; justify-content: center; background: #1b5e20; color: #fff; border-color: #2e7d32; padding: 5px; font-size: 0.75rem; border-radius: 4px;">+
                 Ekle</button>
             <button onclick="hikayeSil()"
                 style="margin: 0; flex: 1; justify-content: center; background: #b71c1c; color: #fff; border-color: #c62828; padding: 5px; font-size: 0.75rem; border-radius: 4px;">-
                 Sil</button>
-=======
-            <button onclick="hikayeEkle()" style="margin: 0; flex: 1; justify-content: center; background: #1b5e20; color: #fff; border-color: #2e7d32; padding: 5px; font-size: 0.75rem; border-radius: 4px;">+ Ekle</button>
-            <button onclick="hikayeSil()" style="margin: 0; flex: 1; justify-content: center; background: #b71c1c; color: #fff; border-color: #c62828; padding: 5px; font-size: 0.75rem; border-radius: 4px;">- Sil</button>
->>>>>>> 90a5e6d8d9334c5b95705f365ce59d05d5b3acb9
         </div>
     </div>
 
@@ -297,40 +287,10 @@
     </div>
 
     <script>
-        // Varsayılan Hikaye Verileri
-<<<<<<< HEAD
         const defaultData = {};
 
-        // Gerçek içerikleri buraya tekrar yazıyorum (View File'dan aldığım halleriyle)
+        // Tüm varsayılan hikaye verileri temizlendi
         const fullDefaults = {};
-
-=======
-        const defaultData = {
-            arcelik: { menuIsmi: "Arçelik", metin: `I'was in the comfort zone at Arçelik...\n(Arçelik metni buraya gelecek)` },
-            ayrilmak: { menuIsmi: "Ayrılmak İstiyorsun", metin: `(Dosya içeriği boş veya mevcut değil.)` },
-            ben: { menuIsmi: "Ben", metin: `I am also a well-known person...\n(Ben metni buraya gelecek)` },
-            // ... Diğer hikayeler
-        };
-
-        // Gerçek içerikleri buraya tekrar yazıyorum (View File'dan aldığım halleriyle)
-        const fullDefaults = {
-            arcelik: { menuIsmi: "Arçelik", metin: `"I'was  in the comfort zone at Arçelik \n I had a very successful period for six years\n In Arçelik,. I received the \n'Top Performance Award' every year \nfor six years in a row. \nI am very proud of the value \nI added to the company and \nthe recognition I received.\n\nHowever, after a while, \nI realized that the organization's\n structure and growth strategy \nat that time were not suitable for \nopening new positions or promotions.\n Because of this, there was no space \nfor me to take on more responsibility\n or move to a higher level.\n\nFor me, success means reaching new goals and improving my skills. Therefore, I decided to look for a new challenge where I can use my experience in a more dynamic environment with more responsibilities."\n\n"I had a very successful seven years at Arçelik.\n I won the 'Highest Performance Award' every year\n during that time. I am very proud of \n the value I created for Arçelik.\n"I have realized that there are\nno further opportunities for me \nto develop my skills or take on \nmore responsibility within the \ncurrent organization."\nArçelik's growth strategy at that time\n did not support opening new \n tech. leader positions, \nso I was unable to get a promotion."\n\n\nHONESTLY , Arçelik was far from my home. I spent 3 hours on the road every day. \nHomeoffice was over.\nAnd my development had stopped.\nI'was  in the comfort zone at arçelik\nassemcorp would be a new development area for me.\nI want to work in a more technologically advanced company with challenging jobs.\nbecause of this I want to work with infineon.\n\n"Önceki şirketimde 6 yıl boyunca üst üste 'En Yüksek Performans Ödülü' alacak kadar verimli ve başarılı bir süreç geçirdim. Şirketime kattığım değerden ve aldığım bu takdirlerden dolayı gurur duyuyorum.\n\nAncak gelinen noktada, mevcut organizasyon yapısı içerisinde yetkinliklerimi bir üst seviyeye taşıyabileceğim veya daha fazla sorumluluk alabileceğim bir alan kalmadığını fark ettim. Benim için başarıyı sürdürülebilir kılmak, her zaman yeni hedeflere koşmakla mümkün. Bu nedenle, performansımı ve tecrübemi daha dinamik bir yapıda, daha geniş sorumluluklarla değerlendirmek istediğim için bu değişikliği yapmaya karar verdim."\n\n"Şirketin o dönemdeki büyüme stratejisi yeni kadro açılmasına uygun değildi" bu yüzden terfi de alalmadım.` },
-            ayrilmak: { menuIsmi: "Ayrılmak İstiyorsun", metin: `(Dosya içeriği boş veya mevcut değil.)` },
-            ben: { menuIsmi: "Ben", metin: `I am also a well-known person in the Turkish R&D market.\nEveryone knows me at Arçelik. All software and hardware team leaders\nSince I studied in Izmir, I have many school friends at Vestel.\n\nI enjoy learning new things, sharing knowledge, and working in a team.\n\nI am a responsible and organized person. \nI am an extrovert and social person. comm. problem solving\nI always try to do my work on time and with good quality. \nI can work alone or in a team. \nI enjoy solving technical problems and learning new things.\nI don't hide what I know. I try to help if there's anything I can.\nI think Quectel can also meet these needs.\n\nI can desing a project from the beginning to mass production. \nI work on both hardware and software sides.\n\nAlso, I have experience in project management. \nI can communicate well with customers and team members. \nI stay calm under pressure and focus on solutions, not problems."\n\nweekness\nSometimes, when a project is very challenging, \nI can become a bit too focused on details, which \nsometimes slows me down. \nI am not very good at saying no.` },
-            future: { menuIsmi: "Gelecek", metin: `*******************************Future***************************************\n"In the future, I want to become an expert in \nembedded systems with a focus on IoT , Wifi, GSM, and \nGNSS technologies. I already have strong experience in \nembedded development, and now I want to go deeper in these areas. \n\nI would also like to work on smart and connected products that\nare useful in real life. My goal is to keep learning and \nbecome a specialist in IOT communication systems in embedded projects."\n\nBy 2030, 30-40 billion IoT devices will be active.\nIoT systems collect data. Data means analysis, \ndecision-making, and automation. Combined with \nartificial intelligence, it becomes incredibly \npowerful. Homes, factories, and cars are becoming \ncapable of making autonomous decisions.` },
-            interview: { menuIsmi: "Mülakat (Emre Karabek)", metin: `"Hello, I'm Emre Karabek. \nI'm an Embedded Systems Engineer \nwith over 16 years of experience \nworking on both hardware and software.\n\nI have been working at Assemcorp for 15 months. \nBefore that, I worked at Beko-Arçelik for about 7 years and \nat Panasonic for about 8 years."\n\nFor about six months now, \nI've been working as a (FAE) at Assemcorp. \nMy main focus here is to accelerate and \nsimplify our customers' design processes \nwith ARM-based microcontrollers and sensors.\n\nI've developed a 'Pin Configurator' tool myself.\nThis tool has incredibly simplified our customers'\nmigration to our products. \nThis technical support has also had a \ndirect commercial impact; \nour sales have gained significant momentum,\nand we are currently on track to \nsell 5 million MCUs this year.\n\nBefore this job, I worked as an Embedded Software Developer.\nin the software team at Beko central R&D department.\nI was the Arçelik RTOS responsible.\nI supported all Beko R&D centers about embedded systems.\nI have developed many projects, especially on \nthe Panasonic and Beko side, \nand currently there are millions of these products in the field.\n\nI can design development kits. I did this at Panasonic and Beko. \nNow, I do it at Assemcorp.\n\nIf you want, I can show you the kits I made.\n\nI organize some embeeded workshops for customers and \nuniversities with these kits.\n\nI also gave university lectures and worked on \ninternational projects like Horizon 2027. \n\nThat's it in short\nthanks for taking the time for me\nnice to meet you\nI hope to see you again\n\n\n****************************************************************************\nzorlayan proje ve nasıl çözdün\n"We had a big project. My teammates didn't understand it \nvery well. I made a prototype to show them it was simple. \nThen we worked step by step. \nFinally, we finished the project on time."\n\nOne of my greatest features is to make the job look simple.\n\nseni ne motive eder.\n"I am motivated when I learn new things and \nsolve hard complex problems. I like to work on creative \nprojects that can help people. Also, I enjoy working with a team and \nseeing our ideas become real results."\n\nbaskı altında nasıl davranıorsun\n"I'm not affected by pressure because \nI have so much experience in this field. \nI've faced many challenging projects before.\nI stay calm under pressure and \nfocus on solutions, not problems."\n\n+++++++++++++++++++++ sanctions ++++++++++++++++++++++++++++++++++\nThe factory in Russia experienced material shortages due to sanctions. \nThe washing machine's mcu needed to be replaced. We found a way \naround the sanctions. We were going to find a Chinese brand for the \nmcu and send it to Russia. We found a suitable MCU from Sinowealth \nand quickly adapted the software. We completed the project very quickly,\nensuring mass production was not disrupted. Annual production is \napproximately 1 million units.` },
-            nedeninf: { menuIsmi: "Neden Infineon?", metin: `"Actually, for me, Infineon is like Real Madrid \nin the semiconductor industry. \nIt is not just the market leader; \nit sets the standards for technology, \nand it works with the best. \nThat is why I want to be here.\n\nI have used the PSoC series since the beginning of \nmy career. For me, PSoC is not just a product, \nbut a great engineering standard. \nWhen I designed my own 'Pin Configurator'\n tool for customers, I was inspired by \n Infineon’s user-friendly and efficient system.\n\nNow, I want to join your team. I know this \ntechnology very well, and I have 3 million \ndevices working in the field. I want to use \nmy experience to solve design problems for \ncustomers and help the team move forward."` },
-            quectel: { menuIsmi: "Quectel", metin: `Actually, I don't want to leave Assemcorp, but \nI really want to work at Quectel.\nUnfortunately, this opportunities do not always exist.\n\nBecause Quectel is a global leader in IoT solutions.\nI want to learn more and improve myself. \nI believe Quectel is the best place for me.\nHonestly, I would like to work at Quectel.\n I also think that every project in quectel \nwill force me to improve my skills.\n\n I am into tech, teamwork and making a real impact, \n I believe that every project will force me to develop my skills,\n that why quectel will be awesome place to be for me\n\nAssemcorp is a local company and does the same job as \neveryone else. It sells MCU.\n\nI believe I can add good value to your team. \n\nne mutsuz eder\n"If there is no chance to improve myself or \nlearn new things, I feel unhappy. \nI like to grow and learn at work."\nIf there is no good communication, I feel unhappy.\nBut I know very well that these things are not available in Qectel.\n\n\nMerhaba, ben Qutel'de Kuzey Amerika satış başkan yardcısı olan Natasha Barios'um\nBir IoT cihazını tanımlama, geliştirme ve piyasaya sürme aşamasında\nher karar önemlidir, özellikle de seçtiğiniz ortaklar.\nBirden fazla tedarikçiyle çalışmak, genellikle gecikmelere, entegrasyon sorunlarına ve\nsorunlar ortaya çıktığında suçlamalara yol açabilir. Peki modüllerinizi,\nantenlerinizi ve son cihaz sertifikalarınızı tek bir güvenilir kaynaktan alabilseydiniz ne olurdu?\nQuctile'ı tek IoT ortağınız olarak seçmeniz, pazara daha hızlı ulaşma, garantili\nbileşen uyumluluğu ve sorunsuz teknik destek anlamına gelir. Yani artık\ntedarikçiler arasında gidip gelme yok, sadece\nürününüzü tanımladığınız andan ürün lansmanınıza kadar size rehberlik eden tek bir uzman ekip var. Bu,\nriski azaltmanızı, maliyetleri düşürmenizi ve gönül rahatlığına kavuşmanızı sağlar . Çünkü her şey\ntasarım gereği birlikte çalışır. Tek ortak, tek çözüm, daha akıllı bir dünya inşa etmenin tek kesin yolu\nQuctel'i tek küresel IoT ortağınız olarak kullanmanın avantajlarını keşfetmek için bugün bizimle iletişime geçin.\n\nQuectel'in güçlü Ar-Ge yeteneklerinden, kapsamlı uzmanlığından, \ngeniş yelpazedeki yüksek kaliteli ürünlerinden ve müşteri taleplerini \nön planda tutma konusundaki tutarlı felsefesinden yararlanan Quectel,\n2010 yılında kurulduğundan bu yana güvenilir ve itibarlı bir kablosuz \nmodül sağlayıcısı olarak kendini kanıtlamıştır. Quectel'in modülleri, \notomotiv gibi IoT pazarlarında yaygın olarak uygulanabilir.\n \n\n\n Ayrıca Quectel'deki her projenin beni becerilerimi geliştirmeye zorlayacağını düşünüyorum.` },
-            sorular: { menuIsmi: "Genel Sorular", metin: `💼 GENEL MÜLAKAT SORULARI\nBize kendinizden bahseder misiniz?\nNeden bu pozisyonla ilgileniyorsunuz?\nGüçlü yönleriniz nelerdir?\nZayıf yönleriniz nelerdir?\n5 yıl sonra kendinizi nerede görüyorsunuz?\nÖnceki işinizden neden ayrıldınız/ayrılmak istiyorsunuz?\nNeden sizi işe almalıyız?\nŞirketimiz hakkında ne biliyorsunuz?\nEn büyük başarınız nedir?\nBaşarısız olduğunuz bir durumu anlatır mısınız?\n\n👤 DAVRANIŞSAL SORULAR (STAR Tekniği ile Yanıtlanır)\nTakım içinde yaşadığınız bir çatışmayı ve nasıl çözdüğünüzü anlatın.\nZaman baskısı altında nasıl çalışırsınız?\nZor bir müşteriyle nasıl baş ettiniz?\nEleştiri aldığınız bir anı paylaşır mısınız?\nBir problemi yaratıcı şekilde nasıl çözdünüz?` },
-            tubitak: { menuIsmi: "TÜBİTAK & Üniversite", metin: `tubitak, the state's R&D projects support organization and RD structure\nI am a jury member in this organization.\nI go to companies and supervise the projects they write.\nthen i report to tubitak\nI even give some suggestions for projects.\nI had the chance to go to many companies this way.\n\nThe tournament is organized every year.\n\nIt's a project of the Ministry of Industry. \nProfessionals were asked to teach at universities, and \nI volunteered.` },
-            basari: { menuIsmi: "Başarı Hikayesi", metin: "En büyük başarılarımdan biri..." },
-            kriz: { menuIsmi: "Kriz Yönetimi", metin: "Zor durumlarda nasıl aksiyon alırım..." },
-            liderlik: { menuIsmi: "Liderlik", metin: "Ekip yönetimi ve vizyoner yaklaşımım..." },
-            ogrenme: { menuIsmi: "Sürekli Öğrenme", metin: "Yeni teknolojileri takip etme yöntemlerim..." },
-            vizyon: { menuIsmi: "Global Vizyon", metin: "Uluslararası projeler ve global bakış açısı..." },
-            hobi: { menuIsmi: "Hobi ve İlgi Alanları", metin: "İş dışındaki meraklarım ve aktivitelerim..." }
-        };
->>>>>>> 90a5e6d8d9334c5b95705f365ce59d05d5b3acb9
 
         let hikayeler = {};
         let storyOrder = [];
@@ -345,30 +305,11 @@
         }
 
         function loadFromLocalStorage() {
-            const savedData = localStorage.getItem('hikayeApp_data');
-            const savedOrder = localStorage.getItem('hikayeApp_order');
-
-            if (savedData && savedOrder) {
-                hikayeler = JSON.parse(savedData);
-                storyOrder = JSON.parse(savedOrder);
-<<<<<<< HEAD
-
-=======
-                
->>>>>>> 90a5e6d8d9334c5b95705f365ce59d05d5b3acb9
-                // Yeni eklenen defaultları mevcut listeye ekle (eğer yoksa)
-                Object.keys(fullDefaults).forEach(id => {
-                    if (!hikayeler[id]) {
-                        hikayeler[id] = fullDefaults[id];
-                        if (!storyOrder.includes(id)) {
-                            storyOrder.push(id);
-                        }
-                    }
-                });
-            } else {
-                hikayeler = JSON.parse(JSON.stringify(fullDefaults));
-                storyOrder = Object.keys(hikayeler);
-            }
+            // Kişisel notlar temizlendi - LocalStorage sıfırlanıyor
+            localStorage.removeItem('hikayeApp_data');
+            localStorage.removeItem('hikayeApp_order');
+            hikayeler = {};
+            storyOrder = [];
             renderSidebar();
         }
 
@@ -402,11 +343,7 @@
             activeStoryId = id;
             document.getElementById('metin').innerText = hikayeler[id].metin;
             if (isEditingContent) toggleEditContent(); // Düzenleme açıksa kapat
-<<<<<<< HEAD
 
-=======
-            
->>>>>>> 90a5e6d8d9334c5b95705f365ce59d05d5b3acb9
             // Seçili hikayeyi menüde vurgula
             document.querySelectorAll('#story-list button').forEach(b => b.classList.remove('selected-story'));
             const btn = document.querySelector(`#story-list button[data-id="${id}"]`);
