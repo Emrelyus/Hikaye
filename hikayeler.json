@@ -1,0 +1,21 @@
+{
+  "hikayeler": {
+    "story_1777536239498": {
+      "menuIsmi": "1",
+      "metin": "Ben Emre Karabek"
+    },
+    "story_1777536241136": {
+      "menuIsmi": "2",
+      "metin": "Yeni hikaye metni buraya gelecek..."
+    },
+    "story_1777536242804": {
+      "menuIsmi": "3",
+      "metin": "Yeni hikaye metni buraya gelecek..."
+    }
+  },
+  "storyOrder": [
+    "story_1777536239498",
+    "story_1777536241136",
+    "story_1777536242804"
+  ]
+}
