@@ -282,19 +282,23 @@
             <h3>JSON Dosyası</h3>
             <div style="display: flex; gap: 6px; margin-bottom: 6px;">
                 <button id="jsonBindBtn" onclick="jsonDosyasiBagla()"
-                    style="margin: 0; flex: 1; justify-content: center; background: #0d2a4a; color: #7fb3e8; border-color: #1a4a7a; padding: 5px; font-size: 0.7rem; border-radius: 4px;" title="JSON dosyası bağla / oluştur">
+                    style="margin: 0; flex: 1; justify-content: center; background: #0d2a4a; color: #7fb3e8; border-color: #1a4a7a; padding: 5px; font-size: 0.7rem; border-radius: 4px;"
+                    title="JSON dosyası bağla / oluştur">
                     📂 Bağla
                 </button>
                 <button onclick="jsonYukle()"
-                    style="margin: 0; flex: 1; justify-content: center; background: #1a2a1a; color: #7ecf7e; border-color: #2e5e2e; padding: 5px; font-size: 0.7rem; border-radius: 4px;" title="JSON dosyasından yükle">
+                    style="margin: 0; flex: 1; justify-content: center; background: #1a2a1a; color: #7ecf7e; border-color: #2e5e2e; padding: 5px; font-size: 0.7rem; border-radius: 4px;"
+                    title="JSON dosyasından yükle">
                     ⬆ Yükle
                 </button>
                 <button onclick="manuelKaydet()"
-                    style="margin: 0; flex: 1; justify-content: center; background: #2a1a00; color: #f0a040; border-color: #6b4800; padding: 5px; font-size: 0.7rem; border-radius: 4px;" title="JSON dosyasına hemen kaydet">
+                    style="margin: 0; flex: 1; justify-content: center; background: #2a1a00; color: #f0a040; border-color: #6b4800; padding: 5px; font-size: 0.7rem; border-radius: 4px;"
+                    title="JSON dosyasına hemen kaydet">
                     💾 Kaydet
                 </button>
             </div>
-            <span id="jsonFileStatus" style="display:block; font-size:0.72rem; color:#555; text-align:center;">Dosya bağlı değil</span>
+            <span id="jsonFileStatus" style="display:block; font-size:0.72rem; color:#555; text-align:center;">Dosya
+                bağlı değil</span>
         </div>
     </div>
 
@@ -314,14 +318,14 @@
         // ─── IndexedDB: file handle'ı oturumlar arası sakla ───────────────────
         const IDB_NAME = 'hikayeAppDB';
         const IDB_STORE = 'handles';
-        const IDB_KEY   = 'jsonHandle';
+        const IDB_KEY = 'jsonHandle';
 
         function openIDB() {
             return new Promise((res, rej) => {
                 const req = indexedDB.open(IDB_NAME, 1);
                 req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE);
                 req.onsuccess = e => res(e.target.result);
-                req.onerror  = e => rej(e.target.error);
+                req.onerror = e => rej(e.target.error);
             });
         }
         async function idbPut(value) {
@@ -338,7 +342,7 @@
             return new Promise((res, rej) => {
                 const req = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(IDB_KEY);
                 req.onsuccess = e => res(e.target.result);
-                req.onerror  = e => rej(e.target.error);
+                req.onerror = e => rej(e.target.error);
             });
         }
         async function idbClear() {
@@ -358,7 +362,7 @@
             document.getElementById('jsonFileStatus').textContent = '🔗 ' + handle.name + ' — bağlı';
             const btn = document.getElementById('jsonBindBtn');
             btn.style.borderColor = '#2e7d32';
-            btn.style.color       = '#7ecf7e';
+            btn.style.color = '#7ecf7e';
         }
 
         // JSON dosyasına kaydet
@@ -374,7 +378,7 @@
                     }
                 }
                 const writable = await jsonFileHandle.createWritable();
-                const payload  = { hikayeler, storyOrder };
+                const payload = { hikayeler, storyOrder };
                 await writable.write(JSON.stringify(payload, null, 2));
                 await writable.close();
                 document.getElementById('jsonFileStatus').textContent = '✅ ' + jsonFileHandle.name + ' — kaydedildi';
@@ -436,8 +440,8 @@
             const text = await file.text();
             const data = JSON.parse(text);
             if (data.hikayeler && data.storyOrder) {
-                hikayeler    = data.hikayeler;
-                storyOrder   = data.storyOrder;
+                hikayeler = data.hikayeler;
+                storyOrder = data.storyOrder;
                 activeStoryId = null;
                 saveToLocalStorage();
                 renderSidebar();
@@ -635,9 +639,27 @@
             }
         }
 
-        // YÜKLE — önce localStorage'dan başlat, ardından JSON dosyasını otomatik geri yükle
+        // YÜKLE — başlangıçta hikayeler.json otomatik yüklenir
         loadFromLocalStorage();
-        autoRestoreHandle();
+        autoLoadJsonFile();
+
+        // Sayfa açılışında hikayeler.json'u otomatik fetch et
+        async function autoLoadJsonFile() {
+            try {
+                const resp = await fetch('./hikayeler.json', { cache: 'no-store' });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const data = await resp.json();
+                if (data.hikayeler && data.storyOrder) {
+                    hikayeler = data.hikayeler;
+                    storyOrder = data.storyOrder;
+                    renderSidebar();
+                    document.getElementById('jsonFileStatus').textContent = '📖 hikayeler.json — yüklendi';
+                }
+            } catch (e) {
+                // file:// protokolü veya dosya yok → IDB handle'dan dene
+                await autoRestoreHandle();
+            }
+        }
 
         function hikayeEkle() {
             const isim = prompt("Yeni hikayenin adını girin:");
