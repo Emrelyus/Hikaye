@@ -283,8 +283,8 @@
             <div style="display: flex; gap: 6px; margin-bottom: 6px;">
                 <button id="jsonBindBtn" onclick="jsonDosyasiBagla()"
                     style="margin: 0; flex: 1; justify-content: center; background: #0d2a4a; color: #7fb3e8; border-color: #1a4a7a; padding: 5px; font-size: 0.7rem; border-radius: 4px;"
-                    title="JSON dosyası bağla / oluştur">
-                    📂 Bağla
+                    title="Klasör seç, hikayeler.json otomatik oluşturulur">
+                    📂 Seç
                 </button>
                 <button onclick="jsonYukle()"
                     style="margin: 0; flex: 1; justify-content: center; background: #1a2a1a; color: #7ecf7e; border-color: #2e5e2e; padding: 5px; font-size: 0.7rem; border-radius: 4px;"
@@ -315,10 +315,11 @@
         let activeStoryId = null;
         let isEditingContent = false;
 
-        // ─── IndexedDB: file handle'ı oturumlar arası sakla ───────────────────
-        const IDB_NAME = 'hikayeAppDB';
+        // ─── IndexedDB: handle'ları oturumlar arası sakla ────────────────────
+        const IDB_NAME = 'hikayeAppDB_v2';
         const IDB_STORE = 'handles';
-        const IDB_KEY = 'jsonHandle';
+        const IDB_KEY_FILE = 'jsonHandle';
+        const IDB_KEY_DIR = 'dirHandle';
 
         function openIDB() {
             return new Promise((res, rej) => {
@@ -328,19 +329,19 @@
                 req.onerror = e => rej(e.target.error);
             });
         }
-        async function idbPut(value) {
+        async function idbPut(key, value) {
             const db = await openIDB();
             return new Promise((res, rej) => {
                 const tx = db.transaction(IDB_STORE, 'readwrite');
-                tx.objectStore(IDB_STORE).put(value, IDB_KEY);
+                tx.objectStore(IDB_STORE).put(value, key);
                 tx.oncomplete = res;
                 tx.onerror = e => rej(e.target.error);
             });
         }
-        async function idbGet() {
+        async function idbGet(key) {
             const db = await openIDB();
             return new Promise((res, rej) => {
-                const req = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(IDB_KEY);
+                const req = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(key);
                 req.onsuccess = e => res(e.target.result);
                 req.onerror = e => rej(e.target.error);
             });
@@ -349,7 +350,7 @@
             const db = await openIDB();
             return new Promise((res, rej) => {
                 const tx = db.transaction(IDB_STORE, 'readwrite');
-                tx.objectStore(IDB_STORE).delete(IDB_KEY);
+                tx.objectStore(IDB_STORE).clear();
                 tx.oncomplete = res;
                 tx.onerror = e => rej(e.target.error);
             });
@@ -397,25 +398,52 @@
             await saveToJsonFile();
         }
 
-        // Dosya bağla / oluştur
+        // Klasörden hikayeler.json dosya handle'ını al (yoksa oluştur)
+        async function getOrCreateJsonInDir(dirHandle) {
+            return await dirHandle.getFileHandle('hikayeler.json', { create: true });
+        }
+
+        // Dosya bağla / oluştur — kullanıcı manuel bağlamak isterse
         async function jsonDosyasiBagla() {
-            if (!('showSaveFilePicker' in window)) {
+            if (!('showDirectoryPicker' in window)) {
                 alert('Tarayıcınız File System Access API desteklemiyor. Lütfen güncel Chrome/Edge kullanın.');
                 return;
             }
             try {
-                const handle = await window.showSaveFilePicker({
-                    suggestedName: 'hikayeler.json',
-                    types: [{ description: 'JSON Dosyası', accept: { 'application/json': ['.json'] } }]
-                });
+                const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                await idbPut(IDB_KEY_DIR, dirHandle);
+                const handle = await getOrCreateJsonInDir(dirHandle);
                 jsonFileHandle = handle;
                 setHandleUI(handle);
-                await idbPut(handle);           // Bir sonraki açılış için sakla
-                await saveToJsonFile();         // Mevcut veriyi hemen yaz
+                await idbPut(IDB_KEY_FILE, handle);
+                // Dosyada veri varsa yükle, yoksa mevcut veriyi yaz
+                await loadOrInitJsonFile(handle);
             } catch (err) {
                 if (err.name !== 'AbortError')
                     document.getElementById('jsonFileStatus').textContent = '⚠️ ' + err.message;
             }
+        }
+
+        // Dosyadan veri yükle ya da boşsa mevcut veriyi yaz
+        async function loadOrInitJsonFile(handle) {
+            const statusEl = document.getElementById('jsonFileStatus');
+            try {
+                const file = await handle.getFile();
+                const text = await file.text();
+                if (text.trim()) {
+                    const data = JSON.parse(text);
+                    if (data.hikayeler && data.storyOrder) {
+                        hikayeler = data.hikayeler;
+                        storyOrder = data.storyOrder;
+                        saveToLocalStorage();
+                        renderSidebar();
+                        document.getElementById('metin').innerText = 'Lütfen soldaki menüden bir hikaye seçin.';
+                        statusEl.textContent = '✅ ' + handle.name + ' — yüklendi';
+                        return;
+                    }
+                }
+            } catch (_) { /* boş veya parse hatası → üzerine yaz */ }
+            await saveToJsonFile();
         }
 
         // Dosyadan yükle (kullanıcı seçer)
@@ -448,7 +476,7 @@
                 document.getElementById('metin').innerText = 'Lütfen soldaki menüden bir hikaye seçin.';
                 jsonFileHandle = handle;
                 setHandleUI(handle);
-                await idbPut(handle);   // Bir sonraki açılış için güncelle
+                await idbPut(IDB_KEY_FILE, handle);   // Bir sonraki açılış için güncelle
             } else {
                 alert('Geçersiz JSON formatı.');
             }
@@ -457,7 +485,7 @@
         // Sayfa açılışında önceki handle'ı otomatik geri yükle
         async function autoRestoreHandle() {
             try {
-                const handle = await idbGet();
+                const handle = await idbGet(IDB_KEY_FILE);
                 if (!handle) return;
                 // İzin durumunu kontrol et (kullanıcı etkileşimi gerektirmez)
                 const perm = await handle.queryPermission({ mode: 'readwrite' });
@@ -639,69 +667,86 @@
             }
         }
 
-        // YÜKLE — başlangıçta IDB'den handle geri yükle, yoksa ilk kez dosya seçtir
+        // YÜKLE — başlangıçta IDB'den handle geri yükle, yoksa ilk kez klasör seçtir
         loadFromLocalStorage();
         ilkAcilisHandle();
 
-        // Sayfa açılışında IDB'deki handle'ı dene; yoksa ilk kez dosyayı seçtir/oluştur
+        // Sayfa açılışında kayıtlı klasör handle'ını kontrol et
         async function ilkAcilisHandle() {
             const statusEl = document.getElementById('jsonFileStatus');
             try {
-                const handle = await idbGet();
-                if (handle) {
-                    // Önceden bağlanmış bir dosya var
-                    const perm = await handle.queryPermission({ mode: 'readwrite' });
+                if (!('showDirectoryPicker' in window)) {
+                    statusEl.textContent = '⚠️ File System API desteklenmiyor (Chrome/Edge gerekli)';
+                    return;
+                }
+
+                // Kayıtlı klasör handle'ı var mı?
+                const dirHandle = await idbGet(IDB_KEY_DIR);
+                if (dirHandle) {
+                    // İzin durumunu sorgula (kullanıcı etkileşimi gerektirmez)
+                    const perm = await dirHandle.queryPermission({ mode: 'readwrite' });
                     if (perm === 'granted') {
-                        await applyJsonHandle(handle);
-                    } else {
+                        // Sessizce bağlan
+                        const handle = await getOrCreateJsonInDir(dirHandle);
                         jsonFileHandle = handle;
-                        showRestoreBanner(handle.name);
-                    }
-                } else {
-                    // İlk açılış: kullanıcıdan dosya konumunu seçmesini iste
-                    if (!('showSaveFilePicker' in window)) {
-                        statusEl.textContent = '⚠️ File System API desteklenmiyor (Chrome/Edge gerekli)';
+                        setHandleUI(handle);
+                        await idbPut(IDB_KEY_FILE, handle);
+                        await loadOrInitJsonFile(handle);
+                        return;
+                    } else {
+                        // İzin gerekiyor — banner göster, kullanıcı tıklayınca iste
+                        statusEl.innerHTML = `<span style="color:#f0a040;cursor:pointer" onclick="dirIzinIsteVeBaglan()" title="Tıkla, önceki klasöre tekrar bağlan">🔔 ${dirHandle.name} — izin için tıkla</span>`;
+                        // dirHandle'ı global sakla
+                        window._pendingDirHandle = dirHandle;
                         return;
                     }
-                    statusEl.innerHTML = `<span style="color:#f0a040;cursor:pointer" onclick="ilkDosyaOlustur()" title="Tıkla, hikayeler.json dosyasını oluştur/seç">🔔 İlk açılış — tıkla, JSON dosyasını oluştur</span>`;
                 }
+
+                // Hiç handle yok — ilk kez klasör seçtir
+                statusEl.innerHTML = `<span style="color:#f0a040;cursor:pointer" onclick="ilkKlasorSec()" title="Tıkla, hikayeler.json klasörünü seç">🔔 Tıkla — JSON dosyasının oluşturulacağı klasörü seç</span>`;
             } catch (e) {
                 console.warn('İlk açılış handle hatası:', e);
+                // Hatalı handle varsa temizle ve baştan başlat
+                await idbClear();
+                statusEl.innerHTML = `<span style="color:#f0a040;cursor:pointer" onclick="ilkKlasorSec()" title="Tıkla, Seç">🔔 Tıkla — klasör seç</span>`;
             }
         }
 
-        // İlk açılışta kullanıcı tıklayınca dosyayı seç/oluştur
-        async function ilkDosyaOlustur() {
+        // Önceki klasöre izin isteyerek bağlan
+        async function dirIzinIsteVeBaglan() {
+            const statusEl = document.getElementById('jsonFileStatus');
+            const dirHandle = window._pendingDirHandle;
+            if (!dirHandle) return;
+            try {
+                const perm = await dirHandle.requestPermission({ mode: 'readwrite' });
+                if (perm === 'granted') {
+                    const handle = await getOrCreateJsonInDir(dirHandle);
+                    jsonFileHandle = handle;
+                    setHandleUI(handle);
+                    await idbPut(IDB_KEY_FILE, handle);
+                    await loadOrInitJsonFile(handle);
+                } else {
+                    statusEl.textContent = '⚠️ İzin reddedildi';
+                }
+            } catch (e) {
+                statusEl.textContent = '⚠️ ' + e.message;
+            }
+        }
+
+        // İlk açılışta kullanıcı tıklayınca klasörü seç ve JSON dosyasını oluştur
+        async function ilkKlasorSec() {
             const statusEl = document.getElementById('jsonFileStatus');
             try {
-                const handle = await window.showSaveFilePicker({
-                    suggestedName: 'hikayeler.json',
-                    types: [{ description: 'JSON Dosyası', accept: { 'application/json': ['.json'] } }]
-                });
+                const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                await idbPut(IDB_KEY_DIR, dirHandle);
+                const handle = await getOrCreateJsonInDir(dirHandle);
                 jsonFileHandle = handle;
                 setHandleUI(handle);
-                await idbPut(handle);
-                // Dosya zaten içerik barındırıyorsa oku, yoksa mevcut veriyi yaz
-                try {
-                    const file = await handle.getFile();
-                    const text = await file.text();
-                    if (text.trim()) {
-                        const data = JSON.parse(text);
-                        if (data.hikayeler && data.storyOrder) {
-                            hikayeler = data.hikayeler;
-                            storyOrder = data.storyOrder;
-                            saveToLocalStorage();
-                            renderSidebar();
-                            document.getElementById('metin').innerText = 'Lütfen soldaki menüden bir hikaye seçin.';
-                            statusEl.textContent = '✅ ' + handle.name + ' — yüklendi';
-                            return;
-                        }
-                    }
-                } catch (_) { /* boş dosya veya parse hatası → üzerine yaz */ }
-                await saveToJsonFile();  // Mevcut (boş) veriyi dosyaya yaz
+                await idbPut(IDB_KEY_FILE, handle);
+                await loadOrInitJsonFile(handle);
             } catch (err) {
                 if (err.name !== 'AbortError')
-                    document.getElementById('jsonFileStatus').textContent = '⚠️ ' + err.message;
+                    statusEl.textContent = '⚠️ ' + err.message;
             }
         }
 
